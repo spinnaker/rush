@@ -1,0 +1,9 @@
+spinnaker:
+  cassandra:
+    cluster: 'spinnaker'
+    keyspace: 'runs'
+netflix:
+  appinfo:
+    name: 'spinnaker-runs'
+
+docker.host: 'http://mydockerhost'
