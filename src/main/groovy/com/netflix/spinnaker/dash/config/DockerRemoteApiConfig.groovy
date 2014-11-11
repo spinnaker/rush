@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.runs.config
+package com.netflix.spinnaker.dash.config
 
 import static retrofit.Endpoints.newFixedEndpoint
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.netflix.spinnaker.runs.docker.client.DockerRemoteApiClient
+import com.netflix.spinnaker.dash.docker.client.DockerRemoteApiClient
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

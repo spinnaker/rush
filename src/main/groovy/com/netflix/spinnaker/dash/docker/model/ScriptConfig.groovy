@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.runs.docker.client.model
+package com.netflix.spinnaker.dash.docker.model
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import org.hibernate.validator.constraints.NotEmpty
 
-class ContainerDetails {
+class ScriptConfig {
 
-  @JsonProperty('Cmd')
-  List<String> commands
+  @NotEmpty
+  String command
 
-  @JsonProperty('Image')
+  @NotEmpty
   String image
 
 }

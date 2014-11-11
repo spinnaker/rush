@@ -1,4 +1,4 @@
-package com.netflix.spinnaker.runs.docker.model
+package com.netflix.spinnaker.dash.docker.model
 
 import com.fasterxml.jackson.annotation.JsonInclude
 

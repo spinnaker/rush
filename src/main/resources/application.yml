@@ -1,9 +1,9 @@
 spinnaker:
   cassandra:
     cluster: 'spinnaker'
-    keyspace: 'runs'
+    keyspace: 'dash'
 netflix:
   appinfo:
-    name: 'spinnaker-runs'
+    name: 'spinnaker-dash'
 
 docker.host: 'http://mydockerhost'

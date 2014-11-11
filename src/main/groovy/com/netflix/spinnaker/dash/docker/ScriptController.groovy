@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.runs.docker
+package com.netflix.spinnaker.dash.docker
 
-import com.netflix.spinnaker.runs.docker.model.ScriptConfig
-import com.netflix.spinnaker.runs.docker.model.ScriptExecution
+import com.netflix.spinnaker.dash.docker.model.ScriptConfig
+import com.netflix.spinnaker.dash.docker.model.ScriptExecution
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody

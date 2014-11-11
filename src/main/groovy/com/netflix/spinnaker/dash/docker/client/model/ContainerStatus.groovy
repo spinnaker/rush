@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.runs.docker.model
+package com.netflix.spinnaker.dash.docker.client.model
 
-public enum ScriptExecutionStatus {
-  PREPARING, FETCHING_IMAGE, RUNNING, SUCCESSFUL, FAILED
+import com.fasterxml.jackson.annotation.JsonProperty
+
+class ContainerStatus {
+
+  @JsonProperty('StatusCode')
+  int statusCode
+
 }

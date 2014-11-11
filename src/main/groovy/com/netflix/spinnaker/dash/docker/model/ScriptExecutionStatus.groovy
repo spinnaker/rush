@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.runs.docker.client.model
+package com.netflix.spinnaker.dash.docker.model
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
-class Image {
-
-  @JsonProperty('RepoTags')
-  List<String> repoTags
-
+public enum ScriptExecutionStatus {
+  PREPARING, FETCHING_IMAGE, RUNNING, SUCCESSFUL, FAILED
 }

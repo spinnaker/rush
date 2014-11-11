@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.runs.config
+package com.netflix.spinnaker.dash.config
 
 import com.netflix.appinfo.InstanceInfo
 import org.springframework.context.annotation.Bean
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.FilterType
  * I generally exclude @Configuration's from this scan, as picking those up can affect your tests.
  */
 @Configuration
-@ComponentScan(basePackages = ['com.netflix.spinnaker.runs.docker'],
+@ComponentScan(basePackages = ['com.netflix.spinnaker.dash.docker'],
   excludeFilters = @ComponentScan.Filter(value = Configuration,
     type = FilterType.ANNOTATION))
 class ComponentConfig {

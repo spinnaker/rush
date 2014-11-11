@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.runs.config
+package com.netflix.spinnaker.dash.config
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import cz.jirutka.spring.exhandler.RestHandlerExceptionResolver
