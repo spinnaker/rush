@@ -44,7 +44,7 @@ class DockerRemoteApiConfig {
     new RestAdapter.Builder()
       .setEndpoint(newFixedEndpoint(dockerHost))
       .setClient(new OkClient())
-      .setLogLevel(LogLevel.FULL)
+      .setLogLevel(LogLevel.BASIC)
       .setConverter(new JacksonConverter(objectMapper))
       .build()
       .create(DockerRemoteApiClient)

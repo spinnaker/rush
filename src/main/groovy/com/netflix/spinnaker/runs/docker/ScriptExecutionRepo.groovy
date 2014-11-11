@@ -23,6 +23,7 @@ import com.netflix.astyanax.serializers.IntegerSerializer
 import com.netflix.astyanax.serializers.StringSerializer
 import com.netflix.astyanax.util.TimeUUIDUtils
 import com.netflix.spinnaker.runs.docker.model.ScriptConfig
+import com.netflix.spinnaker.runs.docker.model.ScriptExecution
 import com.netflix.spinnaker.runs.docker.model.ScriptExecutionStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
@@ -54,26 +55,55 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
                   container varchar,
                   logs text,
                   error text,
-                  statusCode varchar,
+                  status_code varchar,
                   PRIMARY KEY (id)
                 ) with compression={};'''
     }
   }
 
   String create(ScriptConfig config) {
-    String executionId = TimeUUIDUtils.getUniqueTimeUUIDinMicros().toString()
-    runQuery """insert into execution(id,status,command,image) values($id, '${
+    String executionId = TimeUUIDUtils.getUniqueTimeUUIDinMicros()
+    runQuery """insert into execution(id,status,command,image) values($executionId, '${
       ScriptExecutionStatus.PREPARING
     }', '${config.command}', '${config.image}');"""
     executionId
   }
 
-  void updateField(id, field, value) {
+  void updateField(String id, String field, String value) {
     runQuery "update execution set ${field} = '${value}' where id = ${id};"
+  }
+
+  void updateStatus(String id, ScriptExecutionStatus status) {
+    updateField(id, 'status', status.toString())
+  }
+
+  List<ScriptExecution> list() {
+    def result = runQuery("select * from execution;")
+    result.result.rows.collect { row ->
+      convertRow( row )
+    }
+  }
+
+  ScriptExecution get(String id){
+    def result = runQuery("select * from execution where id = $id;")
+    convertRow(result.result.rows.first())
   }
 
   private runQuery(String query) {
     keyspace.prepareQuery(CF_EXECUTIONS).withCql(query).execute()
+  }
+
+  private ScriptExecution convertRow( def row ){
+    new ScriptExecution(
+      id        : row.columns.getColumnByName('id').getUUIDValue(),
+      status    : row.columns.getStringValue('status', null),
+      command   : row.columns.getStringValue('command', null),
+      image     : row.columns.getStringValue('image', null),
+      container : row.columns.getStringValue('container', null),
+      logs      : row.columns.getStringValue('logs', null),
+      error     : row.columns.getStringValue('error', null),
+      statusCode: row.columns.getStringValue('status_code', null)
+    )
   }
 
 }

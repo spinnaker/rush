@@ -17,7 +17,9 @@
 package com.netflix.spinnaker.runs.docker
 
 import com.netflix.spinnaker.runs.docker.model.ScriptConfig
+import com.netflix.spinnaker.runs.docker.model.ScriptExecution
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -31,9 +33,22 @@ class ScriptController {
   @Autowired
   ScriptExecutor executor
 
+  @Autowired
+  ScriptExecutionRepo repo
+
   @RequestMapping(value = 'ops', method = RequestMethod.POST)
-  String runScript(@RequestBody @Valid ScriptConfig config) {
+  Map runScript(@RequestBody @Valid ScriptConfig config) {
     executor.startScript(config)
+  }
+
+  @RequestMapping(value = 'tasks', method = RequestMethod.GET)
+  List<ScriptExecution> list() {
+    repo.list()
+  }
+
+  @RequestMapping(value = 'tasks/{id}', method = RequestMethod.GET)
+  ScriptExecution get(@PathVariable(value='id')String id) {
+    repo.get(id)
   }
 
 }

@@ -32,19 +32,20 @@ import org.springframework.context.annotation.Configuration
 @ComponentScan('com.netflix.spinnaker.runs.config')
 class Application extends SpringBootServletInitializer {
 
-    static void main(String[] args) {
-        if (System.getProperty('netflix.environment') == null) {
-            System.setProperty('netflix.environment', 'test')
-        }
-        SpringApplication.run(Application, args)
+  static void main(String[] args) {
+    if (System.getProperty('netflix.environment') == null) {
+      System.setProperty('netflix.environment', 'test')
     }
+    SpringApplication.run(Application, args)
+  }
 
-    @Override
-    SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        if (System.getProperty('netflix.environment') == null) {
-            System.setProperty('netflix.environment', 'test')
-        }
-        application.sources(Application)
-        super.configure(application)
+  @Override
+  SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+    if (System.getProperty('netflix.environment') == null) {
+      System.setProperty('netflix.environment', 'test')
     }
+    application.sources(Application)
+    super.configure(application)
+  }
+
 }

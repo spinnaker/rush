@@ -21,9 +21,11 @@ import com.netflix.spinnaker.runs.docker.client.model.ContainerDetails
 import com.netflix.spinnaker.runs.docker.client.model.ContainerInfo
 import com.netflix.spinnaker.runs.docker.client.model.ContainerStatus
 import com.netflix.spinnaker.runs.docker.model.ScriptConfig
+import com.netflix.spinnaker.runs.docker.model.ScriptExecutionStatus
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import retrofit.RetrofitError
 import retrofit.client.Response
 
 @Slf4j
@@ -37,30 +39,12 @@ class ScriptExecutor {
   ScriptExecutionRepo executionRepo
 
   String startScript(ScriptConfig config) {
-    if (isImageValid(config.image)) {
-
-      ContainerInfo containerInfo = dockerClient.createContainer(
-        new ContainerDetails(
-          image: config.image,
-          commands: [
-            config.command
-          ]
-        )
-      )
-      String containerId = containerInfo.id
-      dockerClient.startContainer(containerId)
-      ContainerStatus status = dockerClient.waitContainer(containerId)
-      dockerClient.logsFromContainer(containerId).body.in().text
-      return containerId
-    } else {
-      throw new Exception("Invalid image specified")
-    }
-  }
-
-  boolean isImageValid(String imageName) {
+    String executionId = executionRepo.create(config)
+    String imageName = config.image
     if (!imageName.contains(':')) {
       imageName = "${imageName}:latest"
     }
+    executionRepo.updateStatus(executionId, ScriptExecutionStatus.FETCHING_IMAGE)
     boolean imageFound = dockerClient.listImages().collect {
       it.repoTags
     }.flatten().contains(imageName)
@@ -68,11 +52,33 @@ class ScriptExecutor {
       Response response = dockerClient.createImage(imageName)
       String responseText = response.body.in().text
       if (responseText.contains("errorDetail")) {
-        imageFound = false
-      } else {
-        imageFound = true
+        executionRepo.updateStatus(executionId, ScriptExecutionStatus.FAILED)
+        executionRepo.updateField(executionId, 'error', 'cannot retrieve image')
+        return
       }
     }
-    imageFound
+    executionRepo.updateStatus(executionId, ScriptExecutionStatus.RUNNING)
+    ContainerInfo containerInfo = dockerClient.createContainer(
+      new ContainerDetails(
+        image: config.image,
+        commands: config.command.split(' ')
+      )
+    )
+    String containerId = containerInfo.id
+    executionRepo.updateField(executionId, 'container', containerId)
+    try {
+      dockerClient.startContainer(containerId)
+    } catch (RetrofitError e) {
+      executionRepo.updateStatus(executionId, ScriptExecutionStatus.FAILED)
+      return
+    }
+    ContainerStatus status = dockerClient.waitContainer(containerId)
+    executionRepo.updateField(executionId, 'status_code', status.statusCode.toString())
+    String logs = dockerClient.logsFromContainer(containerId).body.in().text
+    executionRepo.updateField(executionId, 'logs', logs)
+    executionRepo.updateStatus(executionId,
+      status.statusCode == 0 ? ScriptExecutionStatus.SUCCESSFUL : ScriptExecutionStatus.FAILED)
+    executionId
   }
+
 }
