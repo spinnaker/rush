@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.docker
+package com.netflix.spinnaker.dash.scripts
 
-import com.netflix.spinnaker.dash.docker.model.ScriptConfig
-import com.netflix.spinnaker.dash.docker.model.ScriptExecution
+import com.netflix.spinnaker.dash.scripts.model.ScriptConfig
+import com.netflix.spinnaker.dash.scripts.model.ScriptExecution
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
@@ -38,7 +38,7 @@ class ScriptController {
 
   @RequestMapping(value = 'ops', method = RequestMethod.POST)
   Map runScript(@RequestBody @Valid ScriptConfig config) {
-    executor.startScript(config)
+    [ task: "/task/${executor.startScript(config)}" ]
   }
 
   @RequestMapping(value = 'tasks', method = RequestMethod.GET)
