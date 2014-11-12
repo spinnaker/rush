@@ -64,11 +64,11 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
   }
 
   String create(ScriptConfig config) {
-    String executionId = TimeUUIDUtils.getUniqueTimeUUIDinMicros()
+    UUID executionId = TimeUUIDUtils.getUniqueTimeUUIDinMicros()
     runQuery """insert into execution(id,status,command,image,created,last_update) values($executionId, '${
       ScriptExecutionStatus.PREPARING
     }', '${config.command}', '${config.image}', dateof(now()), dateof(now()));"""
-    executionId
+    executionId as String
   }
 
   void updateField(String id, String field, String value) {

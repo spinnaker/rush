@@ -37,8 +37,8 @@ class ScriptController {
   ScriptExecutionRepo repo
 
   @RequestMapping(value = 'ops', method = RequestMethod.POST)
-  Map runScript(@RequestBody @Valid ScriptConfig config) {
-    [ task: "/task/${executor.startScript(config)}" ]
+  String runScript(@RequestBody @Valid ScriptConfig config) {
+    executor.startScript(config)
   }
 
   @RequestMapping(value = 'tasks', method = RequestMethod.GET)
