@@ -21,6 +21,7 @@ import static retrofit.Endpoints.newFixedEndpoint
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netflix.spinnaker.dash.docker.client.DockerRemoteApiClient
+import com.squareup.okhttp.OkHttpClient
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -29,6 +30,8 @@ import retrofit.RestAdapter
 import retrofit.RestAdapter.LogLevel
 import retrofit.client.OkClient
 import retrofit.converter.JacksonConverter
+
+import java.util.concurrent.TimeUnit
 
 @Configuration
 @CompileStatic
@@ -41,9 +44,13 @@ class DockerRemoteApiConfig {
     objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
+    OkHttpClient okClient = new OkHttpClient()
+    okClient.setConnectTimeout(20, TimeUnit.MINUTES)
+    okClient.setReadTimeout(20, TimeUnit.MINUTES)
+
     new RestAdapter.Builder()
       .setEndpoint(newFixedEndpoint(dockerHost))
-      .setClient(new OkClient())
+      .setClient(new OkClient(okClient))
       .setLogLevel(LogLevel.BASIC)
       .setConverter(new JacksonConverter(objectMapper))
       .build()
