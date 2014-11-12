@@ -37,7 +37,7 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
   Keyspace keyspace
 
   static ColumnFamily<Integer, String> CF_EXECUTIONS
-  static final String CF_NAME = 'application'
+  static final String CF_NAME = 'cfexec'
 
   @Override
   void onApplicationEvent(ContextRefreshedEvent event) {
