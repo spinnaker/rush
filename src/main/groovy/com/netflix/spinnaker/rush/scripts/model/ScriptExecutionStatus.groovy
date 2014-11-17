@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.scripts.model
+package com.netflix.spinnaker.rush.scripts.model
 
 public enum ScriptExecutionStatus {
   PREPARING, FETCHING_IMAGE, RUNNING, SUCCESSFUL, FAILED

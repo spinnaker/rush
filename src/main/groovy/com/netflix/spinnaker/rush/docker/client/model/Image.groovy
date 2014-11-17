@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.scripts.model
+package com.netflix.spinnaker.rush.docker.client.model
 
-import org.hibernate.validator.constraints.NotEmpty
+import com.fasterxml.jackson.annotation.JsonProperty
 
-class ScriptConfig {
+class Image {
 
-  @NotEmpty
-  String command
-
-  @NotEmpty
-  String image
+  @JsonProperty('RepoTags')
+  List<String> repoTags
 
 }

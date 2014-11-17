@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash
+package com.netflix.spinnaker.rush
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration
 @EnableAutoConfiguration(exclude = WebSocketAutoConfiguration)
-@ComponentScan('com.netflix.spinnaker.dash.config')
+@ComponentScan('com.netflix.spinnaker.rush.config')
 class Application extends SpringBootServletInitializer {
 
   static void main(String[] args) {

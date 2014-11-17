@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.scripts
+package com.netflix.spinnaker.rush.scripts
 
 import com.netflix.astyanax.Keyspace
 import com.netflix.astyanax.connectionpool.exceptions.BadRequestException
@@ -22,9 +22,9 @@ import com.netflix.astyanax.model.ColumnFamily
 import com.netflix.astyanax.serializers.IntegerSerializer
 import com.netflix.astyanax.serializers.StringSerializer
 import com.netflix.astyanax.util.TimeUUIDUtils
-import com.netflix.spinnaker.dash.scripts.model.ScriptConfig
-import com.netflix.spinnaker.dash.scripts.model.ScriptExecution
-import com.netflix.spinnaker.dash.scripts.model.ScriptExecutionStatus
+import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
+import com.netflix.spinnaker.rush.scripts.model.ScriptExecution
+import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextRefreshedEvent

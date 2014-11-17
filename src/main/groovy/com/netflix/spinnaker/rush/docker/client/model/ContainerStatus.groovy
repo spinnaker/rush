@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.spinnaker.dash.scripts.model
 
-import com.fasterxml.jackson.annotation.JsonInclude
+package com.netflix.spinnaker.rush.docker.client.model
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class ScriptExecution {
-  UUID id
-  String status
-  String command
-  String image
-  String container
-  String logs
-  String error
-  String statusCode
-  Date created
-  Date lastUpdate
+import com.fasterxml.jackson.annotation.JsonProperty
+
+class ContainerStatus {
+
+  @JsonProperty('StatusCode')
+  int statusCode
+
 }

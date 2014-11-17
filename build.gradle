@@ -38,7 +38,7 @@ repositories {
   }
 }
 
-group = 'com.netflix.spinnaker.dash'
+group = 'com.netflix.spinnaker.rush'
 
 apply plugin: 'spinnaker-gradle-project'
 apply plugin: 'groovy'

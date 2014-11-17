@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.docker.client.model
+package com.netflix.spinnaker.rush.docker.client.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class ContainerStatus {
+class ContainerDetails {
 
-  @JsonProperty('StatusCode')
-  int statusCode
+  @JsonProperty('Cmd')
+  List<String> commands
+
+  @JsonProperty('Image')
+  String image
 
 }

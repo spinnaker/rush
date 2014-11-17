@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.scripts
+package com.netflix.spinnaker.rush.scripts
 
 import com.netflix.astyanax.Keyspace
-import com.netflix.spinnaker.dash.scripts.model.ScriptConfig
-import com.netflix.spinnaker.dash.scripts.model.ScriptExecution
-import com.netflix.spinnaker.dash.scripts.model.ScriptExecutionStatus
+import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
+import com.netflix.spinnaker.rush.scripts.model.ScriptExecution
+import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
 import com.netflix.spinnaker.kork.astyanax.AstyanaxComponents
 import spock.lang.AutoCleanup
 import spock.lang.Shared

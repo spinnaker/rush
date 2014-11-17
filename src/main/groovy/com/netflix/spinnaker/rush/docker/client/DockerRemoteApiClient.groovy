@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.docker.client
+package com.netflix.spinnaker.rush.docker.client
 
-import com.netflix.spinnaker.dash.docker.client.model.ContainerDetails
-import com.netflix.spinnaker.dash.docker.client.model.ContainerInfo
-import com.netflix.spinnaker.dash.docker.client.model.ContainerStatus
-import com.netflix.spinnaker.dash.docker.client.model.Image
+import com.netflix.spinnaker.rush.docker.client.model.ContainerDetails
+import com.netflix.spinnaker.rush.docker.client.model.ContainerInfo
+import com.netflix.spinnaker.rush.docker.client.model.ContainerStatus
+import com.netflix.spinnaker.rush.docker.client.model.Image
 import retrofit.client.Response
 import retrofit.http.Body
 import retrofit.http.GET

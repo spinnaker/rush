@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.scripts
+package com.netflix.spinnaker.rush.scripts
 
-import com.netflix.spinnaker.dash.docker.client.DockerRemoteApiClient
-import com.netflix.spinnaker.dash.docker.client.model.ContainerDetails
-import com.netflix.spinnaker.dash.docker.client.model.ContainerInfo
-import com.netflix.spinnaker.dash.docker.client.model.ContainerStatus
-import com.netflix.spinnaker.dash.scripts.model.ScriptConfig
-import com.netflix.spinnaker.dash.scripts.model.ScriptExecutionStatus
+import com.netflix.spinnaker.rush.docker.client.DockerRemoteApiClient
+import com.netflix.spinnaker.rush.docker.client.model.ContainerDetails
+import com.netflix.spinnaker.rush.docker.client.model.ContainerInfo
+import com.netflix.spinnaker.rush.docker.client.model.ContainerStatus
+import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
+import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

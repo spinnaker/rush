@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.dash.config
+package com.netflix.spinnaker.rush.config
 
 import com.netflix.astyanax.Keyspace
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException
