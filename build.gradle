@@ -16,85 +16,45 @@
 
 buildscript {
   repositories {
-    if (project.hasProperty('internalArtifactory')) {
-      maven { url project.internalArtifactory }
-    } else {
-      jcenter()
-    }
-    maven { url 'http://dl.bintray.com/spinnaker/gradle/' }
-
+    jcenter()
+    maven { url "http://dl.bintray.com/spinnaker/gradle" }
   }
   dependencies {
-    classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.1.8.RELEASE'
-    classpath 'com.netflix.spinnaker:spinnaker-gradle-project:1.9.3'
+    classpath 'com.netflix.spinnaker:spinnaker-gradle-project:1.12.35'
+    classpath "org.springframework.boot:spring-boot-gradle-plugin:1.1.9.RELEASE"
   }
 }
 
-repositories {
-  if (project.hasProperty('internalArtifactory')) {
-    maven { url project.internalArtifactory }
-  } else {
-    jcenter()
+allprojects {
+  apply plugin: "spinnaker-gradle-project"
+  apply plugin: "groovy"
+  apply plugin: "spring-boot"
+
+  group = "com.netflix.spinnaker.rush"
+
+  configurations.all {
+    exclude group: 'javax.servlet', module: 'servlet-api'
+    exclude group: "org.slf4j", module: "slf4j-log4j12"
+    exclude group: "org.mortbay.jetty", module: "servlet-api"
+  }
+
+  repositories {
+    maven { url "http://repo.spring.io/repo" }
+    maven { url 'http://oss.sonatype.org/content/repositories/staging' }
+  }
+
+  dependencies {
+    spinnaker.group("test")
+    spinnaker.group("bootWeb")
+    spinnaker.group("retrofitDefault")
+    compile spinnaker.dependency("groovy")
+    compile spinnaker.dependency("kork")
+    compile spinnaker.dependency("korkCassandra")
+    compile spinnaker.dependency("rxJava")
+    compile spinnaker.dependency('amos')
   }
 }
 
-group = 'com.netflix.spinnaker.rush'
-
-apply plugin: 'spinnaker-gradle-project'
-apply plugin: 'groovy'
-apply plugin: 'spring-boot'
-apply plugin: 'jacoco'
-apply plugin: 'project-report'
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
-def rxJavaVersion = '0.16.1'
-
-configurations.all {
-  resolutionStrategy {
-    force 'org.apache.log4j:log4j:1.2.17'
-    force 'com.google.guava:guava:14.0.1'
-    force 'commons-codec:commons-codec:1.7'
-    force 'javax.ws.rs:javax.ws.rs-api:2.0'
-    force 'com.netflix.rxjava:rxjava-core:0.20.7'
-  }
-  exclude group: 'javax.servlet', module: 'servlet-api'
-  exclude group: 'org.mortbay.jetty', module: 'servlet-api'
-  exclude group: 'ch.qos.logback', module: 'logback-classic'
-  exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
-  exclude group: 'commons-logging', module: 'commons-logging'
-  exclude group: 'javax.ws.rs', module:'jsr311-api'
+ideaConfig {
+  codeStyleXml = file('idea/codeStyle.xml')
 }
-
-dependencies {
-  compile 'org.slf4j:slf4j-api:1.7.7'
-  compile 'org.springframework.boot:spring-boot-starter-web:1.1.8.RELEASE'
-  compile 'org.springframework.boot:spring-boot-starter-actuator:1.1.8.RELEASE'
-  compile 'org.codehaus.groovy:groovy-all:2.3.3'
-  compile 'com.netflix.eureka:eureka-client:1.1.134'
-  compile 'cz.jirutka.spring:spring-rest-exception-handler:1.0.0'
-  compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
-  compile 'com.squareup.retrofit:retrofit:1.7.1'
-  compile 'com.squareup.retrofit:converter-jackson:1.7.1'
-  runtime 'org.slf4j:slf4j-log4j12:1.7.7'
-  runtime 'org.slf4j:jcl-over-slf4j:1.7.7'
-  runtime 'org.slf4j:jul-to-slf4j:1.7.7'
-  runtime 'com.netflix.rxjava:rxjava-core:0.20.7'
-  compile 'com.netflix.spinnaker.kork:kork-cassandra:1.23'
-  testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-  testCompile 'org.spockframework:spock-spring:0.7-groovy-2.0'
-  testRuntime 'org.objenesis:objenesis:2.1'
-  testRuntime 'cglib:cglib-nodep:3.1'
-  testCompile 'org.springframework:spring-test:4.0.6.RELEASE'
-}
-
-jacoco {
-  toolVersion = '0.7.0.201403182114'
-}
-
-run {
-  classpath += configurations.provided
-}
-
-tasks.build.dependsOn('jacocoTestReport')
