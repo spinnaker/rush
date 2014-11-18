@@ -5,5 +5,3 @@ spinnaker:
 netflix:
   appinfo:
     name: 'spinnaker-rush'
-
-docker.host: 'http://mydockerhost'

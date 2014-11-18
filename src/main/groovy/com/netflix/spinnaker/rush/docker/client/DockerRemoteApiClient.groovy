@@ -34,20 +34,20 @@ interface DockerRemoteApiClient {
   ContainerInfo createContainer(@Body ContainerDetails details)
 
   @POST('/containers/{id}/start')
-  Response startContainer(@Path(value = 'id') String id)
+  Response startContainer(@Path('id') String id)
 
   @POST('/containers/{id}/wait')
-  ContainerStatus waitContainer(@Path(value = 'id') String id)
+  ContainerStatus waitContainer(@Path('id') String id)
 
   @Streaming
   @GET('/containers/{id}/logs?stderr=1&stdout=1')
-  Response logsFromContainer(@Path(value = 'id') String id)
+  Response logsFromContainer(@Path('id') String id)
 
   @GET('/images/json')
   List<Image> listImages()
 
   @Streaming
   @POST('/images/create')
-  Response createImage(@Query(value = 'fromImage') String fromImage)
+  Response createImage(@Query('fromImage') String fromImage)
 
 }

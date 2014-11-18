@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.rush.scripts.model
+package com.netflix.spinnaker.rush.docker.client.account
 
-import org.hibernate.validator.constraints.NotEmpty
+import com.netflix.spinnaker.amos.AccountCredentials
 
-class ScriptConfig {
+class DockerAccountCredentials implements AccountCredentials<Docker> {
+  String name
+  String url
+  String registry
 
-  @NotEmpty
-  String command
-
-  @NotEmpty
-  String image
-
-  @NotEmpty
-  String credentials
-
+  @Override
+  Docker getCredentials() {
+    new Docker(url, registry)
+  }
 }
