@@ -1,12 +1,14 @@
-Dash
+![Rush](http://www.guitarnoise.com/images/features/rush.jpg)
+
+Rush
 ====
 
-Dash is Spinnaker's script execution service. It is based on running commands in Docker images. It coordinates execution in docker images via the docker remote api. 
+Rush is Spinnaker's script execution service. It is based on running commands in Docker images. It coordinates execution in docker images via the docker remote api. 
 
 Endpoints
 =========
 
-There are 3 endpoints in Dash ( recorded below as http://httpie.org commands ):
+There are 3 endpoints in Rush ( recorded below as http://httpie.org commands ):
 
 Run script
 ----------
