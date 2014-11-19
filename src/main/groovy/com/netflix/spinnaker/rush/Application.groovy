@@ -31,21 +31,33 @@ import org.springframework.context.annotation.Configuration
 @EnableAutoConfiguration(exclude = WebSocketAutoConfiguration)
 @ComponentScan('com.netflix.spinnaker.rush.config')
 class Application extends SpringBootServletInitializer {
+  static {
+    imposeSpinnakerFileConfig("rush-internal.yml")
+    imposeSpinnakerFileConfig("rush-local.yml")
+    imposeSpinnakerClasspathConfig("rush-internal.yml")
+    imposeSpinnakerClasspathConfig("rush-local.yml")
+  }
 
-  static void main(String[] args) {
-    if (System.getProperty('netflix.environment') == null) {
-      System.setProperty('netflix.environment', 'test')
+  static void main(_) {
+    SpringApplication.run this, [] as String[]
+  }
+
+  static void imposeSpinnakerFileConfig(String file) {
+    def internalConfig = new File("${System.properties['user.home']}/.spinnaker/${file}")
+    if (internalConfig.exists()) {
+      System.setProperty("spring.config.location", "${System.properties["spring.config.location"]},${internalConfig.canonicalPath}")
     }
-    SpringApplication.run(Application, args)
+  }
+
+  static void imposeSpinnakerClasspathConfig(String resource) {
+    def internalConfig = getClass().getResourceAsStream("/${resource}")
+    if (internalConfig) {
+      System.setProperty("spring.config.location", "${System.properties["spring.config.location"]},classpath:/${resource}")
+    }
   }
 
   @Override
   SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-    if (System.getProperty('netflix.environment') == null) {
-      System.setProperty('netflix.environment', 'test')
-    }
-    application.sources(Application)
-    super.configure(application)
+    application.sources Application
   }
-
 }

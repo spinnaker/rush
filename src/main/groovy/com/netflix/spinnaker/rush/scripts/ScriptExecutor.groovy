@@ -16,76 +16,85 @@
 
 package com.netflix.spinnaker.rush.scripts
 
+import static retrofit.Endpoints.newFixedEndpoint
+
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.annotations.VisibleForTesting
+import com.netflix.spinnaker.amos.AccountCredentialsRepository
 import com.netflix.spinnaker.rush.docker.client.DockerRemoteApiClient
+import com.netflix.spinnaker.rush.docker.client.account.Docker
 import com.netflix.spinnaker.rush.docker.client.model.ContainerDetails
 import com.netflix.spinnaker.rush.docker.client.model.ContainerInfo
 import com.netflix.spinnaker.rush.docker.client.model.ContainerStatus
 import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
+import com.squareup.okhttp.OkHttpClient
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import retrofit.RestAdapter
 import retrofit.RetrofitError
+import retrofit.client.OkClient
 import retrofit.client.Response
+import retrofit.converter.JacksonConverter
 import rx.Scheduler
 import rx.functions.Action0
 import rx.schedulers.Schedulers
+
+import java.util.concurrent.TimeUnit
 
 @Slf4j
 @Component
 class ScriptExecutor {
 
   @Autowired
-  DockerRemoteApiClient dockerClient
+  AccountCredentialsRepository accountCredentialsRepository
 
   @Autowired
   ScriptExecutionRepo executionRepo
 
   Scheduler scheduler = Schedulers.computation()
 
+  Map<String, DockerRemoteApiClient> dockerClients = [:]
+
   String startScript(ScriptConfig configuration) {
+    Docker dockerInfo = accountCredentialsRepository.getOne(configuration.credentials)?.credentials
+    if (!dockerInfo) {
+      new Exception('Invalid credentials specified')
+    }
     String id = executionRepo.create(configuration).toString()
     scheduler.createWorker().schedule(
       new Action0() {
         @Override
         public void call() {
-          processScript(configuration, id)
+          processScript(configuration, id, dockerInfo)
         }
       }
     )
     id
   }
 
-  private void processScript(ScriptConfig config, String executionId) {
+  private void processScript(ScriptConfig config, String executionId, Docker dockerInfo) {
     try {
-      String imageName = config.image
-      log.info("$executionId : checking for latest image: ${config.image}")
-      if (!imageName.contains(':')) {
-        imageName = "${imageName}:latest"
-      }
+      DockerRemoteApiClient dockerClient = getDockerClient(dockerInfo)
+      String imageName = getImageName(config.image, dockerInfo)
       executionRepo.updateStatus(executionId, ScriptExecutionStatus.FETCHING_IMAGE)
-      boolean imageFound = dockerClient.listImages().collect {
-        it.repoTags
-      }.flatten().contains(imageName)
-      if (imageFound) {
-        log.info("$executionId : image ${config.image} found")
-      } else {
-        log.info("$executionId : image ${config.image} not in docker host, fetching")
-        Response response = dockerClient.createImage(imageName)
-        String responseText = response.body.in().text
-        if (responseText.contains("errorDetail")) {
-          executionRepo.updateStatus(executionId, ScriptExecutionStatus.FAILED)
-          executionRepo.updateField(executionId, 'error', 'cannot retrieve image')
-          log.error("$executionId : image ${config.image} could not be fetched")
-          return
-        }
-        log.info("$executionId : image ${config.image} fetched")
+      log.info("$executionId : fetching ${imageName}")
+      Response response = dockerClient.createImage(imageName)
+      String responseText = response.body.in().text
+      if (responseText.contains("errorDetail")) {
+        executionRepo.updateStatus(executionId, ScriptExecutionStatus.FAILED)
+        executionRepo.updateField(executionId, 'error', 'cannot retrieve image ' + imageName)
+        log.error("$executionId : image ${imageName} could not be fetched")
+        return
       }
+      log.info("$executionId : image ${imageName} fetched")
       executionRepo.updateStatus(executionId, ScriptExecutionStatus.RUNNING)
       log.info("$executionId : creating container")
       ContainerInfo containerInfo = dockerClient.createContainer(
         new ContainerDetails(
-          image: config.image,
+          image: imageName,
           commands: config.command.split(' ')
         )
       )
@@ -112,5 +121,39 @@ class ScriptExecutor {
     }
   }
 
+  @VisibleForTesting
+  private DockerRemoteApiClient getDockerClient(Docker dockerInfo) {
+    String url = dockerInfo.url
+    if (!dockerClients.containsKey(url)) {
+      ObjectMapper objectMapper = new ObjectMapper()
+      objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+      objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+      OkHttpClient okClient = new OkHttpClient()
+      okClient.setConnectTimeout(20, TimeUnit.MINUTES)
+      okClient.setReadTimeout(20, TimeUnit.MINUTES)
+
+      DockerRemoteApiClient client = new RestAdapter.Builder()
+        .setEndpoint(newFixedEndpoint(dockerInfo.url))
+        .setClient(new OkClient(okClient))
+        .setLogLevel(RestAdapter.LogLevel.BASIC)
+        .setConverter(new JacksonConverter(objectMapper))
+        .build()
+        .create(DockerRemoteApiClient)
+
+      dockerClients.put(url, client)
+    }
+    dockerClients.get(url)
+  }
+
+  @VisibleForTesting
+  private String getImageName(String image, Docker dockerInfo) {
+    String imageName = image
+    if (!imageName.contains(':')) {
+      imageName = "${imageName}:latest"
+    }
+    String url = dockerInfo.registry.replaceFirst("${new URL(dockerInfo.registry).getProtocol()}://", "");
+    "${url}/${imageName}"
+  }
 
 }

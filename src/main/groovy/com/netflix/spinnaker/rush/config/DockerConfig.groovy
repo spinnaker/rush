@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.rush.config;
+package com.netflix.spinnaker.rush.config
 
+import com.netflix.spinnaker.amos.AccountCredentialsProvider
 import com.netflix.spinnaker.amos.AccountCredentialsRepository
+import com.netflix.spinnaker.amos.DefaultAccountCredentialsProvider
+import com.netflix.spinnaker.amos.MapBackedAccountCredentialsRepository
 import com.netflix.spinnaker.rush.docker.client.account.DockerAccountCredentials
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -28,8 +32,21 @@ import org.springframework.web.client.RestTemplate
 
 import javax.annotation.PostConstruct
 
+@Slf4j
 @Configuration
 class DockerConfig {
+
+  @Bean
+  @ConditionalOnMissingBean(AccountCredentialsRepository)
+  AccountCredentialsRepository accountCredentialsRepository() {
+    new MapBackedAccountCredentialsRepository()
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(AccountCredentialsProvider)
+  AccountCredentialsProvider accountCredentialsProvider(AccountCredentialsRepository accountCredentialsRepository) {
+    new DefaultAccountCredentialsProvider(accountCredentialsRepository)
+  }
 
   @Bean
   @ConditionalOnMissingBean(RestTemplate)
@@ -54,6 +71,7 @@ class DockerConfig {
     @PostConstruct
     void init() {
       for (account in dockerConfigurationProperties.accounts) {
+        log.info "Adding account ${account.name}"
         accountCredentialsRepository.save(account.name, account)
       }
     }
