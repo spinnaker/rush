@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 class ContainerInfo {
 
-  @JsonProperty('Id')
-  String id
+  @JsonProperty('State')
+  ContainerState state
 
 }

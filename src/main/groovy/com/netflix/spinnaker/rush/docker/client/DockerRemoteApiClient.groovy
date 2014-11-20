@@ -16,10 +16,9 @@
 
 package com.netflix.spinnaker.rush.docker.client
 
-import com.netflix.spinnaker.rush.docker.client.model.ContainerDetails
+import com.netflix.spinnaker.rush.docker.client.model.ContainerLaunchDetails
+import com.netflix.spinnaker.rush.docker.client.model.ContainerLaunchResult
 import com.netflix.spinnaker.rush.docker.client.model.ContainerInfo
-import com.netflix.spinnaker.rush.docker.client.model.ContainerStatus
-import com.netflix.spinnaker.rush.docker.client.model.Image
 import retrofit.client.Response
 import retrofit.http.Body
 import retrofit.http.GET
@@ -31,20 +30,13 @@ import retrofit.http.Streaming
 interface DockerRemoteApiClient {
 
   @POST('/containers/create')
-  ContainerInfo createContainer(@Body ContainerDetails details)
+  ContainerLaunchResult createContainer(@Body ContainerLaunchDetails details)
 
   @POST('/containers/{id}/start')
   Response startContainer(@Path('id') String id)
 
-  @POST('/containers/{id}/wait')
-  ContainerStatus waitContainer(@Path('id') String id)
-
-  @Streaming
-  @GET('/containers/{id}/logs?stderr=1&stdout=1')
-  Response logsFromContainer(@Path('id') String id)
-
-  @GET('/images/json')
-  List<Image> listImages()
+  @GET('/containers/{id}/json')
+  ContainerInfo getContainerInfo(@Path('id') String id)
 
   @Streaming
   @POST('/images/create')

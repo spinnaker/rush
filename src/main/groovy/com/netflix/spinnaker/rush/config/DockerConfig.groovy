@@ -21,6 +21,7 @@ import com.netflix.spinnaker.amos.AccountCredentialsRepository
 import com.netflix.spinnaker.amos.DefaultAccountCredentialsProvider
 import com.netflix.spinnaker.amos.MapBackedAccountCredentialsRepository
 import com.netflix.spinnaker.rush.docker.client.account.DockerAccountCredentials
+import com.netflix.spinnaker.rush.scripts.ScriptExecutionPoller
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -46,6 +47,12 @@ class DockerConfig {
   @ConditionalOnMissingBean(AccountCredentialsProvider)
   AccountCredentialsProvider accountCredentialsProvider(AccountCredentialsRepository accountCredentialsRepository) {
     new DefaultAccountCredentialsProvider(accountCredentialsRepository)
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(ScriptExecutionPoller)
+  ScriptExecutionPoller poller() {
+    new ScriptExecutionPoller()
   }
 
   @Bean

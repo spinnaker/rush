@@ -25,9 +25,6 @@ buildscript {
   }
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
 allprojects {
   apply plugin: "spinnaker-gradle-project"
   apply plugin: "groovy"
@@ -55,6 +52,11 @@ allprojects {
     compile spinnaker.dependency("korkCassandra")
     compile spinnaker.dependency("rxJava")
     compile spinnaker.dependency('amos')
+  }
+
+  plugins.withType(JavaPlugin) {
+    sourceCompatibility = "1.7"
+    targetCompatibility = "1.7"
   }
 }
 

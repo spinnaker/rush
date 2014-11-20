@@ -17,10 +17,10 @@
 package com.netflix.spinnaker.rush.scripts
 
 import com.netflix.astyanax.Keyspace
+import com.netflix.spinnaker.kork.astyanax.AstyanaxComponents
 import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecution
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
-import com.netflix.spinnaker.kork.astyanax.AstyanaxComponents
 import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
@@ -107,21 +107,36 @@ class ScriptExecutionRepoSpec extends Specification {
     execution.status == 'FAILED'
   }
 
-  void 'should update fields'(){
+  void 'should update fields'() {
     given:
     String logs = 'this is the new logs'
     String id = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
     ScriptExecution execution = repo.get(id)
 
     expect:
-    execution.logs == null
+    execution.statusCode == null
 
     when:
-    repo.updateField(id, 'logs', logs)
+    repo.updateField(id, 'status_code', '0')
     execution = repo.get(id)
 
     then:
-    execution.logs == logs
+    execution.statusCode == '0'
+  }
+
+  void 'can get running jobs'() {
+    given:
+    String id1 = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
+    repo.updateStatus(id1, ScriptExecutionStatus.FAILED)
+
+    String id2 = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
+    repo.updateStatus(id2, ScriptExecutionStatus.RUNNING)
+
+    String id3 = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
+    repo.updateStatus(id3, ScriptExecutionStatus.RUNNING)
+
+    expect:
+    repo.runningExecutions.collect { it.id.toString() } == [id2, id3]
   }
 
 }

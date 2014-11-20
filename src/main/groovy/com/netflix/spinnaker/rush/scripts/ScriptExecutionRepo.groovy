@@ -22,6 +22,7 @@ import com.netflix.astyanax.model.ColumnFamily
 import com.netflix.astyanax.serializers.IntegerSerializer
 import com.netflix.astyanax.serializers.StringSerializer
 import com.netflix.astyanax.util.TimeUUIDUtils
+import com.netflix.spinnaker.amos.AccountCredentialsRepository
 import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecution
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
@@ -35,6 +36,9 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
 
   @Autowired
   Keyspace keyspace
+
+  @Autowired
+  AccountCredentialsRepository accountCredentialsRepository
 
   static ColumnFamily<Integer, String> CF_EXECUTIONS
   static final String CF_NAME = 'cfexec'
@@ -53,21 +57,24 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
                   command varchar,
                   image varchar,
                   container varchar,
-                  logs text,
-                  error text,
+                  credentials varchar,
+                  logs varchar,
+                  error varchar,
                   status_code varchar,
-                  PRIMARY KEY (id),
                   created timestamp,
                   last_update timestamp,
+                  PRIMARY KEY (id)
                 ) with compression={};'''
+
+      runQuery '''CREATE INDEX execution_status ON execution (status);'''
     }
   }
 
   String create(ScriptConfig config) {
     UUID executionId = TimeUUIDUtils.getUniqueTimeUUIDinMicros()
-    runQuery """insert into execution(id,status,command,image,created,last_update) values($executionId, '${
+    runQuery """insert into execution(id,status,command,image,credentials,created,last_update) values($executionId, '${
       ScriptExecutionStatus.PREPARING
-    }', '${config.command}', '${config.image}', dateof(now()), dateof(now()));"""
+    }', '${config.command}', '${config.image}', '${config.credentials}', dateof(now()), dateof(now()));"""
     executionId as String
   }
 
@@ -82,6 +89,13 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
 
   List<ScriptExecution> list() {
     def result = runQuery("select * from execution;")
+    result.result.rows.collect { row ->
+      convertRow(row)
+    }
+  }
+
+  List<ScriptExecution> getRunningExecutions() {
+    def result = runQuery("select * from execution where status = 'RUNNING';")
     result.result.rows.collect { row ->
       convertRow(row)
     }
@@ -103,11 +117,12 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
       command: row.columns.getStringValue('command', null),
       image: row.columns.getStringValue('image', null),
       container: row.columns.getStringValue('container', null),
-      logs: row.columns.getStringValue('logs', null),
+      credentials: row.columns.getStringValue('credentials', null),
       error: row.columns.getStringValue('error', null),
       statusCode: row.columns.getStringValue('status_code', null),
       lastUpdate: row.getColumns().getDateValue('last_update', null),
-      created: row.getColumns().getDateValue('created', null)
+      created: row.getColumns().getDateValue('created', null),
+      logs: row.getColumns().getStringValue('logs', null)
     )
   }
 

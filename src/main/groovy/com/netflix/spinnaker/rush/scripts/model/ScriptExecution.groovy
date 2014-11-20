@@ -23,10 +23,11 @@ class ScriptExecution {
   String status
   String command
   String image
+  String credentials
   String container
-  String logs
   String error
   String statusCode
+  String logs
   Date created
   Date lastUpdate
 }

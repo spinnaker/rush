@@ -16,11 +16,16 @@
 
 package com.netflix.spinnaker.rush.docker.client.model
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class ContainerStatus {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+class ContainerLaunchDetails {
 
-  @JsonProperty('StatusCode')
-  int statusCode
+  @JsonProperty('Cmd')
+  List<String> command
+
+  @JsonProperty('Image')
+  String image
 
 }
