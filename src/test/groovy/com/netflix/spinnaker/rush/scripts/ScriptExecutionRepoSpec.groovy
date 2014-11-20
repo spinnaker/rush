@@ -136,7 +136,7 @@ class ScriptExecutionRepoSpec extends Specification {
     repo.updateStatus(id3, ScriptExecutionStatus.RUNNING)
 
     expect:
-    repo.runningExecutions.collect { it.id.toString() } == [id2, id3]
+    repo.runningExecutions.collect { it.id.toString() }.sort() == [id2, id3].sort()
   }
 
 }
