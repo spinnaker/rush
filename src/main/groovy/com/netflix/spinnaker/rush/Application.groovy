@@ -37,6 +37,11 @@ class Application extends SpringBootServletInitializer {
     imposeSpinnakerClasspathConfig("rush-internal.yml")
     imposeSpinnakerClasspathConfig("rush-local.yml")
   }
+  
+ @Override
+  protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+    builder.sources(Application)
+  }
 
   static void main(_) {
     SpringApplication.run this, [] as String[]
@@ -56,8 +61,4 @@ class Application extends SpringBootServletInitializer {
     }
   }
 
-  @Override
-  SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-    application.sources Application
-  }
 }
