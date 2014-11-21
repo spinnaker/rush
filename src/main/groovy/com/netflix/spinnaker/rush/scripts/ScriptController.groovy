@@ -39,7 +39,7 @@ class ScriptController {
   @RequestMapping(value = 'ops', method = RequestMethod.POST)
   Map<String, String> runScript(@RequestBody @Valid ScriptConfig config) {
     String taskId = executor.startScript(config)
-    ['ref': '/tasks/'+taskId]
+    ['id': taskId]
   }
 
   @RequestMapping(value = 'tasks', method = RequestMethod.GET)
