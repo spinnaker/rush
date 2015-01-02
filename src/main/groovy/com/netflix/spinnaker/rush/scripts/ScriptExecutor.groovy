@@ -80,7 +80,7 @@ class ScriptExecutor {
       log.info("$executionId : creating container")
       ContainerLaunchDetails details = new ContainerLaunchDetails(image: imageName)
       if (config.command) {
-        log.info("$executionId : executinng with command ${config.command}")
+        log.info("$executionId : executing with command ${config.command}")
         details.command = config.command.split(' ')
       } else {
         log.info("$executionId : using default command")
