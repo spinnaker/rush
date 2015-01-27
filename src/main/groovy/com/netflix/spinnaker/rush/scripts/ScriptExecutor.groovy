@@ -103,4 +103,21 @@ class ScriptExecutor {
 
   }
 
+  String getLogs(String executionId, ScriptConfig configuration) {
+    Docker dockerInfo = accountCredentialsRepository.getOne(configuration.credentials)?.credentials
+
+    if (!dockerInfo) {
+      throw new Exception("Invalid credentials specified.")
+    }
+
+    try {
+      DockerRemoteApiClient dockerClient = DockerInfoUtils.getDockerClient(dockerInfo)
+      Response logsResponse = dockerClient.getContainerLogs(executionId)
+
+      logsResponse.body.in().text
+    } catch (Exception e) {
+      log.error("Failed to retrieve logs for $executionId:", e)
+    }
+  }
+
 }

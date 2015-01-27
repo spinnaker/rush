@@ -39,6 +39,10 @@ interface DockerRemoteApiClient {
   ContainerInfo getContainerInfo(@Path('id') String id)
 
   @Streaming
+  @GET('/containers/{id}/logs?stderr=1&stdout=1')
+  Response getContainerLogs(@Path('id') String id)
+
+  @Streaming
   @POST('/images/create')
   Response createImage(@Query('fromImage') String fromImage)
 

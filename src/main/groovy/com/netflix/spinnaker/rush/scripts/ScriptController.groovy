@@ -52,4 +52,15 @@ class ScriptController {
     repo.get(id)
   }
 
+  @RequestMapping(value = 'tasks/{id}/logs', method = RequestMethod.POST)
+  Map getLogs(@PathVariable(value='id') String id, @RequestBody @Valid ScriptConfig config) {
+    ScriptExecution scriptExecution = repo.get(id)
+
+    if (scriptExecution?.container) {
+      [logsContent: executor.getLogs(scriptExecution.container, config)]
+    } else {
+      null
+    }
+  }
+
 }
