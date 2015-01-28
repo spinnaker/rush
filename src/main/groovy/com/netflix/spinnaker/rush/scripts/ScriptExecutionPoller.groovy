@@ -69,7 +69,7 @@ class ScriptExecutionPoller implements ApplicationListener<ContextRefreshedEvent
 
   private void updateExecution(ScriptExecution execution) {
     try {
-      log.info('polling state for ' + execution.id + 'with container' + execution.container)
+      log.info('polling state for ' + execution.id + ' with container ' + execution.container)
       Docker dockerInfo = accountCredentialsRepository.getOne(execution.credentials)?.credentials
       DockerRemoteApiClient dockerClient = DockerInfoUtils.getDockerClient(dockerInfo)
       ContainerInfo info = dockerClient.getContainerInfo(execution.container)
