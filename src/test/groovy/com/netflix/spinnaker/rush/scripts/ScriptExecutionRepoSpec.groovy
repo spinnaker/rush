@@ -139,4 +139,16 @@ class ScriptExecutionRepoSpec extends Specification {
     repo.runningExecutions.collect { it.id.toString() }.sort() == [id2, id3].sort()
   }
 
+  void 'logs content is encoded and decoded properly'() {
+    when:
+    String id = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
+    String logsContent = "Some logs content..."
+
+    repo.updateLogsContent(id, logsContent)
+
+    then:
+    ScriptExecution execution = repo.get(id)
+    execution.logsContent == logsContent
+  }
+
 }

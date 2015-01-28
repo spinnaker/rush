@@ -59,6 +59,7 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
                   container varchar,
                   credentials varchar,
                   logs varchar,
+                  logs_content varchar,
                   error varchar,
                   status_code varchar,
                   created timestamp,
@@ -80,6 +81,11 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
 
   void updateField(String id, String field, String value) {
     runQuery "update execution set ${field} = '${value}' where id = ${id};"
+  }
+
+  void updateLogsContent(String id, String logsContent) {
+    def base64EncodedLogsContent = logsContent.bytes.encodeBase64().toString()
+    updateField(id, 'logs_content', base64EncodedLogsContent)
   }
 
   void updateStatus(String id, ScriptExecutionStatus status) {
@@ -110,6 +116,14 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
     keyspace.prepareQuery(CF_EXECUTIONS).withCql(query).execute()
   }
 
+  private static base64Decode(String base64EncodedStr) {
+    if (base64EncodedStr) {
+      new String(base64EncodedStr.decodeBase64())
+    } else {
+      null
+    }
+  }
+
   private ScriptExecution convertRow(def row) {
     new ScriptExecution(
       id: row.columns.getColumnByName('id').getUUIDValue(),
@@ -122,7 +136,8 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
       statusCode: row.columns.getStringValue('status_code', null),
       lastUpdate: row.getColumns().getDateValue('last_update', null),
       created: row.getColumns().getDateValue('created', null),
-      logs: row.getColumns().getStringValue('logs', null)
+      logs: row.getColumns().getStringValue('logs', null),
+      logsContent: base64Decode(row.getColumns().getStringValue('logs_content', null))
     )
   }
 
