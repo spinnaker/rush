@@ -49,18 +49,23 @@ class ScriptController {
 
   @RequestMapping(value = 'tasks/{id}', method = RequestMethod.GET)
   ScriptExecution get(@PathVariable(value='id')String id) {
-    repo.get(id)
+    repo.get(id, false)
   }
 
   @RequestMapping(value = 'tasks/{id}/logs', method = RequestMethod.POST)
   Map getLogs(@PathVariable(value='id') String id, @RequestBody @Valid ScriptConfig config) {
-    ScriptExecution scriptExecution = repo.get(id)
+    ScriptExecution scriptExecution = repo.get(id, true)
+    String logsContent = null
 
-    if (scriptExecution?.container) {
-      [logsContent: executor.getLogs(scriptExecution.container, config)]
-    } else {
-      null
+    // First check if the logs have been persisted.
+    if (scriptExecution?.logsContent) {
+      logsContent = scriptExecution?.logsContent
+    } else if (scriptExecution?.container) {
+      // If not, fallback is to query Docker directly.
+      logsContent = executor.getLogs(scriptExecution.container, config)
     }
+
+    [logsContent: logsContent]
   }
 
 }

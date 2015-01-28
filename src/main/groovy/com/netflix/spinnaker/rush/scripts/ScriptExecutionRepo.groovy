@@ -58,7 +58,7 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
                   image varchar,
                   container varchar,
                   credentials varchar,
-                  logs varchar,
+                  logs_content varchar,
                   error varchar,
                   status_code varchar,
                   created timestamp,
@@ -82,6 +82,11 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
     runQuery "update execution set ${field} = '${value}' where id = ${id};"
   }
 
+  void updateLogsContent(String id, String logsContent) {
+    def base64EncodedLogsContent = logsContent.bytes.encodeBase64().toString()
+    updateField(id, 'logs_content', base64EncodedLogsContent)
+  }
+
   void updateStatus(String id, ScriptExecutionStatus status) {
     updateField(id, 'status', status.toString())
     runQuery "update execution set last_update = dateof(now()) where id = ${id};"
@@ -90,28 +95,36 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
   List<ScriptExecution> list() {
     def result = runQuery("select * from execution;")
     result.result.rows.collect { row ->
-      convertRow(row)
+      convertRow(row, false)
     }
   }
 
   List<ScriptExecution> getRunningExecutions() {
     def result = runQuery("select * from execution where status = 'RUNNING';")
     result.result.rows.collect { row ->
-      convertRow(row)
+      convertRow(row, false)
     }
   }
 
-  ScriptExecution get(String id) {
+  ScriptExecution get(String id, boolean includeLogsContent) {
     def result = runQuery("select * from execution where id = $id;")
-    convertRow(result.result.rows.first())
+    convertRow(result.result.rows.first(), includeLogsContent)
   }
 
   private runQuery(String query) {
     keyspace.prepareQuery(CF_EXECUTIONS).withCql(query).execute()
   }
 
-  private ScriptExecution convertRow(def row) {
-    new ScriptExecution(
+  private static base64Decode(String base64EncodedStr) {
+    if (base64EncodedStr) {
+      new String(base64EncodedStr.decodeBase64())
+    } else {
+      null
+    }
+  }
+
+  private ScriptExecution convertRow(def row, boolean includeLogsContent) {
+    def scriptExecution = new ScriptExecution(
       id: row.columns.getColumnByName('id').getUUIDValue(),
       status: row.columns.getStringValue('status', null),
       command: row.columns.getStringValue('command', null),
@@ -121,9 +134,14 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
       error: row.columns.getStringValue('error', null),
       statusCode: row.columns.getStringValue('status_code', null),
       lastUpdate: row.getColumns().getDateValue('last_update', null),
-      created: row.getColumns().getDateValue('created', null),
-      logs: row.getColumns().getStringValue('logs', null)
+      created: row.getColumns().getDateValue('created', null)
     )
+
+    if (includeLogsContent) {
+      scriptExecution.logsContent = base64Decode(row.getColumns().getStringValue('logs_content', null))
+    }
+
+    scriptExecution
   }
 
 }

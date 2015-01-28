@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.stereotype.Component
+import retrofit.client.Response
 import rx.functions.Action0
 import rx.schedulers.Schedulers
 
@@ -68,7 +69,7 @@ class ScriptExecutionPoller implements ApplicationListener<ContextRefreshedEvent
 
   private void updateExecution(ScriptExecution execution) {
     try {
-      log.info('polling state for ' + execution.id + 'with container' + execution.container)
+      log.info('polling state for ' + execution.id + ' with container ' + execution.container)
       Docker dockerInfo = accountCredentialsRepository.getOne(execution.credentials)?.credentials
       DockerRemoteApiClient dockerClient = DockerInfoUtils.getDockerClient(dockerInfo)
       ContainerInfo info = dockerClient.getContainerInfo(execution.container)
@@ -77,6 +78,12 @@ class ScriptExecutionPoller implements ApplicationListener<ContextRefreshedEvent
       if (!state.isRunning) {
         log.info('state for ' + execution.id + ' changed')
         executionRepo.updateField(execution.id.toString(), 'status_code', state.exitCode as String)
+
+        // Store base64encoded logs content.
+        Response logsResponse = dockerClient.getContainerLogs(execution.container)
+        String logsResponseContent = logsResponse.body.in().text
+        executionRepo.updateLogsContent(execution.id.toString(), logsResponseContent)
+
         executionRepo.updateStatus(execution.id.toString(),
           (state.exitCode == 0 ? ScriptExecutionStatus.SUCCESSFUL : ScriptExecutionStatus.FAILED))
       }
