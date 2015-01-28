@@ -37,9 +37,4 @@ class DockerInfoUtilsSpec extends Specification {
     'image:bluespar' || 'repo/image:bluespar'
   }
 
-  void 'generates correct logs url'(){
-    expect:
-    DockerInfoUtils.getLogsUrl(dockerInfo, 'aaakkk') == 'url/containers/aaakkk/logs?stderr=1&stdout=1'
-  }
-
 }

@@ -65,7 +65,7 @@ class ScriptExecutionRepoSpec extends Specification {
     when:
     String id = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
     String id2 = repo.create(new ScriptConfig(image: 'image2', command: 'ls'))
-    ScriptExecution execution = repo.get(id)
+    ScriptExecution execution = repo.get(id, false)
 
     then:
     id != null
@@ -92,7 +92,7 @@ class ScriptExecutionRepoSpec extends Specification {
   void 'should update time when updating status'() {
     given:
     String id = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
-    ScriptExecution execution = repo.get(id)
+    ScriptExecution execution = repo.get(id, false)
 
     expect:
     execution.lastUpdate == execution.created
@@ -100,7 +100,7 @@ class ScriptExecutionRepoSpec extends Specification {
 
     when:
     repo.updateStatus(id, ScriptExecutionStatus.FAILED)
-    execution = repo.get(id)
+    execution = repo.get(id, false)
 
     then:
     execution.lastUpdate > execution.created
@@ -111,14 +111,14 @@ class ScriptExecutionRepoSpec extends Specification {
     given:
     String logs = 'this is the new logs'
     String id = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
-    ScriptExecution execution = repo.get(id)
+    ScriptExecution execution = repo.get(id, false)
 
     expect:
     execution.statusCode == null
 
     when:
     repo.updateField(id, 'status_code', '0')
-    execution = repo.get(id)
+    execution = repo.get(id, false)
 
     then:
     execution.statusCode == '0'
@@ -139,15 +139,28 @@ class ScriptExecutionRepoSpec extends Specification {
     repo.runningExecutions.collect { it.id.toString() }.sort() == [id2, id3].sort()
   }
 
+  void 'queried execution properly excludes logs content'() {
+    when:
+    String id = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
+    String logsContent = "Some logs content..."
+    repo.updateLogsContent(id, logsContent)
+
+    then:
+    ScriptExecution execution = repo.get(id, false)
+    execution.image == 'image1'
+    execution.command == 'bash'
+    execution.status == 'PREPARING'
+    !execution.logsContent
+  }
+
   void 'logs content is encoded and decoded properly'() {
     when:
     String id = repo.create(new ScriptConfig(image: 'image1', command: 'bash'))
     String logsContent = "Some logs content..."
-
     repo.updateLogsContent(id, logsContent)
 
     then:
-    ScriptExecution execution = repo.get(id)
+    ScriptExecution execution = repo.get(id, true)
     execution.logsContent == logsContent
   }
 

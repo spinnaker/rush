@@ -27,7 +27,6 @@ class ScriptExecution {
   String container
   String error
   String statusCode
-  String logs
   String logsContent
   Date created
   Date lastUpdate

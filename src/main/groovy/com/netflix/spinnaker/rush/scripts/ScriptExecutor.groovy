@@ -89,7 +89,6 @@ class ScriptExecutor {
       String containerId = containerInfo.id
       log.info("$executionId : container created with id : $containerId")
       executionRepo.updateField(executionId, 'container', containerId)
-      executionRepo.updateField(executionId, 'logs', DockerInfoUtils.getLogsUrl(dockerInfo, containerId) )
       try {
         dockerClient.startContainer(containerId)
         executionRepo.updateStatus(executionId, ScriptExecutionStatus.RUNNING)

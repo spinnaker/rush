@@ -49,8 +49,4 @@ class DockerInfoUtils {
     dockerClients.get(url)
   }
 
-  static String getLogsUrl(Docker dockerInfo, String containerId){
-    "${dockerInfo.url}/containers/${containerId}/logs?stderr=1&stdout=1"
-  }
-
 }
