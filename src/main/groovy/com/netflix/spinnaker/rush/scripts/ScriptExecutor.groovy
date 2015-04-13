@@ -51,10 +51,11 @@ class ScriptExecutor {
     if (!dockerInfo) {
       new Exception('Invalid credentials specified')
     }
-    String id = executionRepo.create(configuration).toString()
     if (configuration.tokenizedCommand) {
+      // Build up one command to persist.
       configuration.command = configuration.tokenizedCommand.join(" ")
     }
+    String id = executionRepo.create(configuration).toString()
     scheduler.createWorker().schedule(
       new Action0() {
         @Override
