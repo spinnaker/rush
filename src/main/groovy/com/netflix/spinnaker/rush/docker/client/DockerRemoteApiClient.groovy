@@ -19,6 +19,7 @@ package com.netflix.spinnaker.rush.docker.client
 import com.netflix.spinnaker.rush.docker.client.model.ContainerLaunchDetails
 import com.netflix.spinnaker.rush.docker.client.model.ContainerLaunchResult
 import com.netflix.spinnaker.rush.docker.client.model.ContainerInfo
+import com.netflix.spinnaker.rush.docker.client.model.ContainerStartDetails
 import retrofit.client.Response
 import retrofit.http.Body
 import retrofit.http.GET
@@ -33,7 +34,7 @@ interface DockerRemoteApiClient {
   ContainerLaunchResult createContainer(@Body ContainerLaunchDetails details)
 
   @POST('/containers/{id}/start')
-  Response startContainer(@Path('id') String id)
+  Response startContainer(@Path('id') String id, @Body ContainerStartDetails details)
 
   @GET('/containers/{id}/json')
   ContainerInfo getContainerInfo(@Path('id') String id)

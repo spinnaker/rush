@@ -20,12 +20,18 @@ import org.hibernate.validator.constraints.NotEmpty
 
 class ScriptConfig {
 
+  // Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence.
   String command
+
+  // Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence.
+  List<String> tokenizedCommand
 
   @NotEmpty
   String image
 
   @NotEmpty
   String credentials
+
+  boolean privileged
 
 }
