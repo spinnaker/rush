@@ -22,6 +22,7 @@ import com.netflix.spinnaker.rush.docker.client.DockerRemoteApiClient
 import com.netflix.spinnaker.rush.docker.client.account.Docker
 import com.netflix.spinnaker.rush.docker.client.model.ContainerLaunchDetails
 import com.netflix.spinnaker.rush.docker.client.model.ContainerLaunchResult
+import com.netflix.spinnaker.rush.docker.client.model.ContainerStartDetails
 import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
 import groovy.util.logging.Slf4j
@@ -51,6 +52,9 @@ class ScriptExecutor {
       new Exception('Invalid credentials specified')
     }
     String id = executionRepo.create(configuration).toString()
+    if (configuration.tokenizedCommand) {
+      configuration.command = configuration.tokenizedCommand.join(" ")
+    }
     scheduler.createWorker().schedule(
       new Action0() {
         @Override
@@ -79,7 +83,10 @@ class ScriptExecutor {
       log.info("$executionId : image ${imageName} fetched")
       log.info("$executionId : creating container")
       ContainerLaunchDetails details = new ContainerLaunchDetails(image: imageName)
-      if (config.command) {
+      if (config.tokenizedCommand) {
+        log.info("$executionId : executing with tokenized command ${config.tokenizedCommand}")
+        details.command = config.tokenizedCommand
+      } else if (config.command) {
         log.info("$executionId : executing with command ${config.command}")
         details.command = config.command.split(' ')
       } else {
@@ -90,7 +97,8 @@ class ScriptExecutor {
       log.info("$executionId : container created with id : $containerId")
       executionRepo.updateField(executionId, 'container', containerId)
       try {
-        dockerClient.startContainer(containerId)
+        ContainerStartDetails startDetails = new ContainerStartDetails(privileged: config.privileged)
+        dockerClient.startContainer(containerId, startDetails)
         executionRepo.updateStatus(executionId, ScriptExecutionStatus.RUNNING)
       } catch (RetrofitError e) {
         executionRepo.updateStatus(executionId, ScriptExecutionStatus.FAILED)
