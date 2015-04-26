@@ -61,6 +61,12 @@ allprojects {
   }
 }
 
+applicationName = 'rush'
+applicationDefaultJvmArgs = ["-Djava.security.egd=file:/dev/./urandom"]
+applicationDistribution.from(project.file('src/main/resources')) {
+  into "config"
+}
+
 ospackage {
   packageName = project.applicationName
   version = project.version.replaceAll("-SNAPSHOT", "")
