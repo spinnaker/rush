@@ -22,6 +22,7 @@ class DockerAccountCredentials implements AccountCredentials<Docker> {
   String name
   String url
   String registry
+  String provider = "not specified"
 
   @Override
   Docker getCredentials() {
