@@ -96,3 +96,5 @@ buildDeb {
 ideaConfig {
   codeStyleXml = file('idea/codeStyle.xml')
 }
+
+defaultTasks 'bootRun'
