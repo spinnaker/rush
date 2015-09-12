@@ -81,7 +81,7 @@ applicationDistribution.from(project.file('src/main/resources')) {
 }
 
 ospackage {
-  packageName = project.applicationName
+  packageName = 'rush'
   version = project.version.replaceAll("-SNAPSHOT", "")
   release '3'
   into "/opt/${project.applicationName}"
