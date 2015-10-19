@@ -16,7 +16,7 @@
 
 package com.netflix.spinnaker.rush.scripts
 
-import com.netflix.spinnaker.amos.AccountCredentialsRepository
+import com.netflix.spinnaker.clouddriver.security.AccountCredentialsRepository
 import com.netflix.spinnaker.rush.docker.client.DockerInfoUtils
 import com.netflix.spinnaker.rush.docker.client.DockerRemoteApiClient
 import com.netflix.spinnaker.rush.docker.client.account.Docker

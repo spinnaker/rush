@@ -22,7 +22,7 @@ import com.netflix.astyanax.model.ColumnFamily
 import com.netflix.astyanax.serializers.IntegerSerializer
 import com.netflix.astyanax.serializers.StringSerializer
 import com.netflix.astyanax.util.TimeUUIDUtils
-import com.netflix.spinnaker.amos.AccountCredentialsRepository
+import com.netflix.spinnaker.clouddriver.security.AccountCredentialsRepository
 import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecution
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
