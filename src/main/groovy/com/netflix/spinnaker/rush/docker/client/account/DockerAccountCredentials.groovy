@@ -16,16 +16,24 @@
 
 package com.netflix.spinnaker.rush.docker.client.account
 
-import com.netflix.spinnaker.amos.AccountCredentials
+import com.netflix.spinnaker.clouddriver.security.AccountCredentials
 
 class DockerAccountCredentials implements AccountCredentials<Docker> {
   String name
+  String environment
+  String accountType
   String url
   String registry
-  String provider = "not specified"
+  String cloudProvider = "not specified"
+  List<String> requiredGroupMembership
 
   @Override
   Docker getCredentials() {
     new Docker(url, registry)
+  }
+
+  @Override
+  String getProvider() {
+    return getCloudProvider()
   }
 }
