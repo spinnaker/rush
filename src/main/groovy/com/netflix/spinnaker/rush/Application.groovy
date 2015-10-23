@@ -31,34 +31,31 @@ import org.springframework.context.annotation.Configuration
 @EnableAutoConfiguration(exclude = WebSocketAutoConfiguration)
 @ComponentScan('com.netflix.spinnaker.rush.config')
 class Application extends SpringBootServletInitializer {
+  static final Map<String, String> DEFAULT_PROPS = [
+    'netflix.environment': 'test',
+    'netflix.account'    : System.getProperty('netflix.environment', 'test'),
+    'netflix.stack'      : 'test',
+    'spring.config.location': "${System.properties['user.home']}/.spinnaker/",
+    'spring.config.name' : 'rush',
+    'spring.profiles.active': "${System.getProperty('netflix.environment', 'test')},local"
+  ]
+
   static {
-    imposeSpinnakerFileConfig("rush-internal.yml")
-    imposeSpinnakerFileConfig("rush-local.yml")
-    imposeSpinnakerClasspathConfig("rush-internal.yml")
-    imposeSpinnakerClasspathConfig("rush-local.yml")
-  }
-  
- @Override
-  protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-    builder.sources(Application)
+    applyDefaults()
   }
 
-  static void main(_) {
-    SpringApplication.run this, [] as String[]
-  }
-
-  static void imposeSpinnakerFileConfig(String file) {
-    def internalConfig = new File("${System.properties['user.home']}/.spinnaker/${file}")
-    if (internalConfig.exists()) {
-      System.setProperty("spring.config.location", "${System.properties["spring.config.location"]},${internalConfig.canonicalPath}")
+  static void applyDefaults() {
+    DEFAULT_PROPS.each { k, v ->
+      System.setProperty(k, System.getProperty(k, v))
     }
   }
 
-  static void imposeSpinnakerClasspathConfig(String resource) {
-    def internalConfig = getClass().getResourceAsStream("/${resource}")
-    if (internalConfig) {
-      System.setProperty("spring.config.location", "${System.properties["spring.config.location"]},classpath:/${resource}")
-    }
+  static void main(String... args) {
+    SpringApplication.run(Application, args)
   }
 
+  @Override
+  SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+    application.sources Application
+  }
 }
