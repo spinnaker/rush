@@ -97,6 +97,10 @@ ospackage {
   from "${project.buildDir}/install/${project.applicationName}"
 }
 
+buildDeb {
+  dependsOn installApp
+}
+
 ideaConfig {
   codeStyleXml = file('idea/codeStyle.xml')
 }
