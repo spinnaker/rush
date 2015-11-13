@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Netflix, Inc.
+ * Copyright 2015 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,19 @@ import com.wordnik.swagger.annotations.ApiModelProperty
 
 class ScriptConfig {
 
-  @ApiModelProperty(value="The command to execute. Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence.")
+  @ApiModelProperty(value="The command to execute. Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence")
   String command
 
-  @ApiModelProperty(value="The tokenized command to execute. Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence.")
+  @ApiModelProperty(value="The tokenized command to execute. Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence")
   List<String> tokenizedCommand
 
-  @ApiModelProperty(value="The docker image to use when executing the command. Only required if using docker.")
+  @ApiModelProperty(value="The docker image to use when executing the command. Only required if using docker")
   String image
 
-  @ApiModelProperty(value="The credentials identifying the docker host. Only required if using docker.")
+  @ApiModelProperty(value="The credentials identifying the docker host. Only required if using docker")
   String credentials
 
-  @ApiModelProperty(value="Whether to execute the command using --privileged mode. Only required if using docker.")
+  @ApiModelProperty(value="Whether to execute the command using --privileged mode. Only required if using docker")
   boolean privileged
 
 }

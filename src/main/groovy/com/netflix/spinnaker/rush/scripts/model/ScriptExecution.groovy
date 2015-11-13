@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Netflix, Inc.
+ * Copyright 2015 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.netflix.spinnaker.rush.scripts.model
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.wordnik.swagger.annotations.ApiModelProperty
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class ScriptExecution {
+
+  @ApiModelProperty(value="The id of the execution")
   UUID id
-  String status
+
+  @ApiModelProperty(value="The status of the execution")
+  ScriptExecutionStatus status
+
+  @ApiModelProperty(value="The executed command")
   String command
+
+  @ApiModelProperty(value="The docker image used, if docker is enabled")
   String image
+
+  @ApiModelProperty(value="The docker credentials used, if docker is enabled")
   String credentials
+
+  @ApiModelProperty(value="The id of the launched docker container, if docker is enabled")
   String container
+
+  @ApiModelProperty(value="Any error message")
   String error
+
+  @ApiModelProperty(value="The exit value/code of the execution")
   String statusCode
+
+  @ApiModelProperty(value="The stdout & stderr of the execution")
   String logsContent
+
+  @ApiModelProperty(value="The date/time when the execution was launched")
   Date created
+
+  @ApiModelProperty(value="The last date/time that the execution status was updated")
   Date lastUpdate
+
 }

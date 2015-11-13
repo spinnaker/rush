@@ -136,9 +136,13 @@ class ScriptExecutorLocal implements ScriptExecutor {
 
   @Override
   String getLogs(ScriptExecution scriptExecution, ScriptConfig configuration) {
+    if (!scriptExecution?.id) {
+      return null
+    }
+
     byte[] stdOutAndErr = executionIdToHandlerMap[scriptExecution.id.toString()]?.stdOutAndErr?.toByteArray()
 
-    stdOutAndErr ? new String(stdOutAndErr) : null
+    return stdOutAndErr ? new String(stdOutAndErr) : null
   }
 
   ScriptExecutionStatus updateExecution(String executionId) {

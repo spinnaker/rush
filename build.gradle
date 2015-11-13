@@ -65,6 +65,7 @@ allprojects {
     compile spinnaker.dependency("kork")
     compile spinnaker.dependency("korkCassandra")
     compile spinnaker.dependency("korkSwagger")
+    compile spinnaker.dependency("korkWeb")
     compile spinnaker.dependency("rxJava")
     compile spinnaker.dependency("clouddriverSecurity")
 

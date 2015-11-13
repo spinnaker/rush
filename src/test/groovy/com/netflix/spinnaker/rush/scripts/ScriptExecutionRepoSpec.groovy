@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Netflix, Inc.
+ * Copyright 2015 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ class ScriptExecutionRepoSpec extends Specification {
     execution != null
     execution.image == 'image1'
     execution.command == 'bash'
-    execution.status == 'PREPARING'
+    execution.status == ScriptExecutionStatus.PREPARING
   }
 
   void 'new ids are added to the list of executions'() {
@@ -96,7 +96,7 @@ class ScriptExecutionRepoSpec extends Specification {
 
     expect:
     execution.lastUpdate == execution.created
-    execution.status == 'PREPARING'
+    execution.status == ScriptExecutionStatus.PREPARING
 
     when:
     repo.updateStatus(id, ScriptExecutionStatus.FAILED)
@@ -104,7 +104,7 @@ class ScriptExecutionRepoSpec extends Specification {
 
     then:
     execution.lastUpdate > execution.created
-    execution.status == 'FAILED'
+    execution.status == ScriptExecutionStatus.FAILED
   }
 
   void 'should update fields'() {
@@ -149,7 +149,7 @@ class ScriptExecutionRepoSpec extends Specification {
     ScriptExecution execution = repo.get(id, false)
     execution.image == 'image1'
     execution.command == 'bash'
-    execution.status == 'PREPARING'
+    execution.status == ScriptExecutionStatus.PREPARING
     !execution.logsContent
   }
 
