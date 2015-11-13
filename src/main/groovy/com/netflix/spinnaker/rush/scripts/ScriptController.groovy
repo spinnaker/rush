@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Netflix, Inc.
+ * Copyright 2015 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package com.netflix.spinnaker.rush.scripts
 
 import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecution
+import com.wordnik.swagger.annotations.ApiOperation
+import com.wordnik.swagger.annotations.ApiParam
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
@@ -36,31 +38,37 @@ class ScriptController {
   @Autowired
   ScriptExecutionRepo repo
 
+  @ApiOperation(value = "Execute a command", notes = "Execute the specified command via either docker or a local process. Returns a map with an id key identifying the new execution.", response = Map)
   @RequestMapping(value = 'ops', method = RequestMethod.POST)
-  Map<String, String> runScript(@RequestBody @Valid ScriptConfig config) {
+  Map<String, String> runScript(@ApiParam(value="The command to execute", required=true) @RequestBody @Valid ScriptConfig config) {
     String taskId = executor.startScript(config)
     ['id': taskId]
   }
 
+  @ApiOperation(value = "List all executions", notes = "List all executions in the execution repository backing this engine.")
   @RequestMapping(value = 'tasks', method = RequestMethod.GET)
   List<ScriptExecution> list() {
     repo.list()
   }
 
+  @ApiOperation(value = "Get execution details", notes = "Get all the details of the specified execution, except for the logs.")
   @RequestMapping(value = 'tasks/{id}', method = RequestMethod.GET)
-  ScriptExecution get(@PathVariable(value='id') String id) {
+  ScriptExecution get(@ApiParam(value="The id of the execution", required=true) @PathVariable(value='id') String id) {
     repo.get(id, false)
   }
 
+  @ApiOperation(value = "Cancel an execution", notes = "Cancel an execution, without regard to the current status.")
   @RequestMapping(value = 'tasks/{id}/cancel', method = RequestMethod.POST)
-  String cancel(@PathVariable(value='id') String id) {
+  String cancel(@ApiParam(value="The id of the execution", required=true) @PathVariable(value='id') String id) {
     executor.cancelExecution(id)
 
     return "Canceled execution $id."
   }
 
+  @ApiOperation(value = "Get execution logs", notes = "Get the logs of the specified execution.")
   @RequestMapping(value = 'tasks/{id}/logs', method = RequestMethod.POST)
-  Map getLogs(@PathVariable(value='id') String id, @RequestBody @Valid ScriptConfig config) {
+  Map getLogs(@ApiParam(value="The id of the execution", required=true) @PathVariable(value='id') String id,
+              @ApiParam(value="The same configuration originally used to launch the execution. This is only needed if running docker, and is used in case the logs are not persisted and need to be retrieved directly from the executor") @RequestBody(required = false) ScriptConfig config) {
     ScriptExecution scriptExecution = repo.get(id, true)
     String logsContent = null
 
