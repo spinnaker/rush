@@ -48,8 +48,15 @@ class ScriptController {
   }
 
   @RequestMapping(value = 'tasks/{id}', method = RequestMethod.GET)
-  ScriptExecution get(@PathVariable(value='id')String id) {
+  ScriptExecution get(@PathVariable(value='id') String id) {
     repo.get(id, false)
+  }
+
+  @RequestMapping(value = 'tasks/{id}/cancel', method = RequestMethod.POST)
+  String cancel(@PathVariable(value='id') String id) {
+    executor.cancelExecution(id)
+
+    return "Canceled execution $id."
   }
 
   @RequestMapping(value = 'tasks/{id}/logs', method = RequestMethod.POST)
@@ -60,9 +67,9 @@ class ScriptController {
     // First check if the logs have been persisted.
     if (scriptExecution?.logsContent) {
       logsContent = scriptExecution?.logsContent
-    } else if (scriptExecution?.container) {
-      // If not, fallback is to query Docker directly.
-      logsContent = executor.getLogs(scriptExecution.container, config)
+    } else {
+      // If not, fallback is to query the executor directly.
+      logsContent = executor.getLogs(scriptExecution, config)
     }
 
     [logsContent: logsContent]

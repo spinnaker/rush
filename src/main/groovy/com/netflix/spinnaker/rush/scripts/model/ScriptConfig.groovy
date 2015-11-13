@@ -16,22 +16,23 @@
 
 package com.netflix.spinnaker.rush.scripts.model
 
-import org.hibernate.validator.constraints.NotEmpty
+import com.wordnik.swagger.annotations.ApiModelProperty
 
 class ScriptConfig {
 
-  // Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence.
+  @ApiModelProperty(value="The command to execute. Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence.")
   String command
 
-  // Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence.
+  @ApiModelProperty(value="The tokenized command to execute. Either command or tokenizedCommand should be specified. tokenizedCommand will take precedence.")
   List<String> tokenizedCommand
 
-  @NotEmpty
+  @ApiModelProperty(value="The docker image to use when executing the command. Only required if using docker.")
   String image
 
-  @NotEmpty
+  @ApiModelProperty(value="The credentials identifying the docker host. Only required if using docker.")
   String credentials
 
+  @ApiModelProperty(value="Whether to execute the command using --privileged mode. Only required if using docker.")
   boolean privileged
 
 }

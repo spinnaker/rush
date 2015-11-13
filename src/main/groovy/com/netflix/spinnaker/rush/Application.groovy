@@ -28,7 +28,10 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration
 @EnableAutoConfiguration(exclude = WebSocketAutoConfiguration)
-@ComponentScan('com.netflix.spinnaker.rush.config')
+@ComponentScan([
+  'com.netflix.spinnaker.rush.config',
+  'com.netflix.spinnaker.config'
+])
 class Application extends SpringBootServletInitializer {
   static final Map<String, String> DEFAULT_PROPS = [
     'netflix.environment'    : 'test',

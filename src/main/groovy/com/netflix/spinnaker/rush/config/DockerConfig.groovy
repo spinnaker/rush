@@ -21,10 +21,13 @@ import com.netflix.spinnaker.clouddriver.security.AccountCredentialsRepository
 import com.netflix.spinnaker.clouddriver.security.DefaultAccountCredentialsProvider
 import com.netflix.spinnaker.clouddriver.security.MapBackedAccountCredentialsRepository
 import com.netflix.spinnaker.rush.docker.client.account.DockerAccountCredentials
+import com.netflix.spinnaker.rush.docker.scripts.ScriptExecutorDocker
 import com.netflix.spinnaker.rush.scripts.ScriptExecutionPoller
+import com.netflix.spinnaker.rush.scripts.ScriptExecutor
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -59,6 +62,12 @@ class DockerConfig {
   @ConditionalOnMissingBean(RestTemplate)
   RestTemplate restTemplate() {
     new RestTemplate()
+  }
+
+  @Bean
+  @ConditionalOnProperty('rush.docker.enabled')
+  ScriptExecutor scriptExecutorDocker() {
+    new ScriptExecutorDocker()
   }
 
   @Component

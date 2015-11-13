@@ -1,7 +1,0 @@
-spinnaker:
-  cassandra:
-    cluster: 'spinnaker'
-    keyspace: 'rush'
-netflix:
-  appinfo:
-    name: 'spinnaker-rush'

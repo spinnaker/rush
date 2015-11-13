@@ -17,19 +17,13 @@
 package com.netflix.spinnaker.rush.scripts
 
 import com.netflix.spinnaker.clouddriver.security.AccountCredentialsRepository
-import com.netflix.spinnaker.rush.docker.client.DockerInfoUtils
-import com.netflix.spinnaker.rush.docker.client.DockerRemoteApiClient
-import com.netflix.spinnaker.rush.docker.client.account.Docker
-import com.netflix.spinnaker.rush.docker.client.model.ContainerInfo
-import com.netflix.spinnaker.rush.docker.client.model.ContainerState
 import com.netflix.spinnaker.rush.scripts.model.ScriptExecution
-import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.stereotype.Component
-import retrofit.client.Response
 import rx.functions.Action0
 import rx.schedulers.Schedulers
 
@@ -39,14 +33,26 @@ import java.util.concurrent.TimeUnit
 @Component
 class ScriptExecutionPoller implements ApplicationListener<ContextRefreshedEvent> {
 
+  @Value('${rush.polling.orphanedExecutionTimeoutMinutes:30}')
+  long orphanedExecutionTimeoutMinutes
+
+  @Value('${rush.polling.runningExecutionUpdateIntervalSeconds:15}')
+  long runningExecutionUpdateIntervalSeconds
+
+  @Value('${rush.polling.canceledExecutionUpdateIntervalSeconds:30}')
+  long canceledExecutionUpdateIntervalSeconds
+
+  @Autowired
+  ScriptExecutor executor
+
   @Autowired
   ScriptExecutionRepo executionRepo
 
   @Autowired
   AccountCredentialsRepository accountCredentialsRepository
 
-
   void onApplicationEvent(ContextRefreshedEvent event) {
+    // Update status of all running executions.
     Schedulers.io().createWorker().schedulePeriodically(
       {
         try {
@@ -61,35 +67,38 @@ class ScriptExecutionPoller implements ApplicationListener<ContextRefreshedEvent
             {} as Action0
           )
         } catch (Exception e) {
-          log.error e
+          log.error e.message
         }
-      } as Action0, 0, 15, TimeUnit.SECONDS
+      } as Action0, 0, runningExecutionUpdateIntervalSeconds, TimeUnit.SECONDS
+    )
+
+    // Check for executions managed by this rush instance that are listed in cassandra as canceled.
+    Schedulers.io().createWorker().schedulePeriodically(
+      {
+        try {
+          executor.synchronizeCanceledExecutions(executionRepo.runningExecutions)
+        } catch (Exception e) {
+          e.printStackTrace()
+          log.error e.message
+        }
+      } as Action0, 0, canceledExecutionUpdateIntervalSeconds, TimeUnit.SECONDS
     )
   }
 
   private void updateExecution(ScriptExecution execution) {
-    try {
-      log.info('polling state for ' + execution.id + ' with container ' + execution.container)
-      Docker dockerInfo = accountCredentialsRepository.getOne(execution.credentials)?.credentials
-      DockerRemoteApiClient dockerClient = DockerInfoUtils.getDockerClient(dockerInfo)
-      ContainerInfo info = dockerClient.getContainerInfo(execution.container)
-      ContainerState state = info.state
+    if (!executor.updateExecution(execution)) {
+      Date currentCassandraTime = executionRepo.currentCassandraTime
+      long executionAgeMs = currentCassandraTime.time - execution.created.time
+      long executionAgeMinutes = executionAgeMs / 1000 / 60
 
-      if (!state.isRunning) {
-        log.info('state for ' + execution.id + ' changed')
-        executionRepo.updateField(execution.id.toString(), 'status_code', state.exitCode as String)
+      log.info("Execution $execution.id ($executionAgeMinutes minutes old) is not managed by this rush instance.")
 
-        // Store base64encoded logs content.
-        Response logsResponse = dockerClient.getContainerLogs(execution.container)
-        String logsResponseContent = logsResponse.body.in().text
-        executionRepo.updateLogsContent(execution.id.toString(), logsResponseContent)
+      if (executionAgeMinutes > orphanedExecutionTimeoutMinutes) {
+        log.info("The age of execution $execution.id ($executionAgeMinutes minutes) has exceeded the value of " +
+                 "orphanedExecutionTimeoutMinutes ($orphanedExecutionTimeoutMinutes minutes).")
 
-        executionRepo.updateStatus(execution.id.toString(),
-          (state.exitCode == 0 ? ScriptExecutionStatus.SUCCESSFUL : ScriptExecutionStatus.FAILED))
+        executor.cancelExecution(execution.id.toString())
       }
-
-    } catch (Exception e) {
-      log.error("failed to update ${execution.id}", e)
     }
   }
 
