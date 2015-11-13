@@ -17,10 +17,8 @@
 package com.netflix.spinnaker.rush.docker.client
 
 import com.netflix.spinnaker.rush.docker.client.account.Docker
-import com.netflix.spinnaker.rush.scripts.ScriptExecutor
 import spock.lang.Shared
 import spock.lang.Specification
-import spock.lang.Subject
 
 class DockerInfoUtilsSpec extends Specification {
 

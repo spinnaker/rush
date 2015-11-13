@@ -1,0 +1,29 @@
+server:
+  port: 8085
+
+rush:
+  polling:
+    orphanedExecutionTimeoutMinutes: 30
+    runningExecutionUpdateIntervalSeconds: 15
+    canceledExecutionUpdateIntervalSeconds: 30
+  jobs:
+    local:
+      timeoutMinutes: 10
+
+spinnaker:
+  cassandra:
+    cluster: 'spinnaker'
+    keyspace: 'rush'
+
+netflix:
+  appinfo:
+    name: 'spinnaker-rush'
+
+swagger:
+  enabled: true
+  title: Spinnaker Rush API
+  description:
+  contact:
+  patterns:
+    - .*/ops.*
+    - .*/tasks.*

@@ -28,7 +28,11 @@ import org.springframework.context.annotation.FilterType
  * I generally exclude @Configuration's from this scan, as picking those up can affect your tests.
  */
 @Configuration
-@ComponentScan(basePackages = ['com.netflix.spinnaker.rush.docker', 'com.netflix.spinnaker.rush.scripts'],
+@ComponentScan(basePackages = [
+  'com.netflix.spinnaker.rush.docker',
+  'com.netflix.spinnaker.rush.local',
+  'com.netflix.spinnaker.rush.scripts'
+],
   excludeFilters = @ComponentScan.Filter(value = Configuration,
     type = FilterType.ANNOTATION))
 class ComponentConfig {

@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package com.netflix.spinnaker.rush.scripts
+package com.netflix.spinnaker.rush.config
 
-import com.netflix.spinnaker.rush.scripts.model.ScriptConfig
-import com.netflix.spinnaker.rush.scripts.model.ScriptExecution
-import com.netflix.spinnaker.rush.scripts.model.ScriptExecutionStatus
+import com.netflix.spinnaker.rush.local.scripts.ScriptExecutorLocal
+import com.netflix.spinnaker.rush.scripts.ScriptExecutor
+import groovy.util.logging.Slf4j
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-interface ScriptExecutor {
-  String startScript(ScriptConfig configuration)
-  ScriptExecutionStatus updateExecution(ScriptExecution execution)
-  String getLogs(ScriptExecution scriptExecution, ScriptConfig configuration)
-  void cancelExecution(String executionId)
-  void synchronizeCanceledExecutions(List<ScriptExecution> runningExecutions)
+@Slf4j
+@Configuration
+class LocalJobConfig {
+
+  @Bean
+  @ConditionalOnMissingBean(ScriptExecutor)
+  ScriptExecutor scriptExecutorLocal() {
+    new ScriptExecutorLocal()
+  }
 }

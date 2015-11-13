@@ -108,7 +108,15 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
 
   ScriptExecution get(String id, boolean includeLogsContent) {
     def result = runQuery("select * from execution where id = $id;")
-    convertRow(result.result.rows.first(), includeLogsContent)
+    def rows = result.result.rows
+
+    rows.size() ? convertRow(rows.first(), includeLogsContent) : null
+  }
+
+  Date getCurrentCassandraTime() {
+    def result = runQuery("select dateof(now()) FROM system.local;")
+    def row = result.result.rows.first()
+    row.columns.getColumnByIndex(0).getDateValue()
   }
 
   private runQuery(String query) {
