@@ -25,10 +25,10 @@ tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
 buildscript {
   repositories {
     jcenter()
-    maven { url "http://dl.bintray.com/spinnaker/gradle" }
+    maven { url "http://spinnaker.bintray.com/gradle" }
   }
   dependencies {
-    classpath 'com.netflix.spinnaker.gradle:spinnaker-gradle-project:2.2.0'
+    classpath 'com.netflix.spinnaker.gradle:spinnaker-gradle-project:2.5.0'
     classpath "org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE"
   }
 }
@@ -64,11 +64,6 @@ allprojects {
     compile spinnaker.dependency("clouddriverSecurity")
 
     compile 'org.apache.commons:commons-exec:1.3'
-  }
-
-  plugins.withType(JavaPlugin) {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
   }
 }
 
