@@ -81,7 +81,7 @@ startScripts {
   }
 }
 
-applicationName = 'rush'
+applicationName = 'rrush'
 applicationDefaultJvmArgs = ["-Djava.security.egd=file:/dev/./urandom", "-Dspring.config.location=/opt/spinnaker/config/"]
 applicationDistribution.from(project.file('src/main/resources')) {
   into "config"
