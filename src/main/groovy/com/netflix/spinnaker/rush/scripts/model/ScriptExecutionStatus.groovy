@@ -17,5 +17,5 @@
 package com.netflix.spinnaker.rush.scripts.model
 
 public enum ScriptExecutionStatus {
-  PREPARING, FETCHING_IMAGE, RUNNING, CANCELED, SUCCESSFUL, FAILED
+  PREPARING, FETCHING_IMAGE, RUNNING, CANCELLED, SUCCESSFUL, FAILED
 }

@@ -62,7 +62,7 @@ class ScriptController {
   String cancel(@ApiParam(value="The id of the execution", required=true) @PathVariable(value='id') String id) {
     executor.cancelExecution(id)
 
-    return "Canceled execution $id."
+    return "Cancelled execution $id."
   }
 
   @ApiOperation(value = "Get execution logs", notes = "Get the logs of the specified execution.")
