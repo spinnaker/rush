@@ -114,6 +114,12 @@ class ScriptExecutorLocal implements ScriptExecutor {
             stdOutAndErr: stdOutAndErr
           ])
           executionRepo.updateStatus(executionId, ScriptExecutionStatus.RUNNING)
+
+          // Give the execution some time to spin up.
+          sleep(500)
+
+          // Update the status right away so we can fail fast if necessary.
+          updateExecution(executionId)
         }
       }
     )
