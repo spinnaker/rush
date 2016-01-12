@@ -16,7 +16,7 @@
 
 package com.netflix.spinnaker.rush.scripts.model
 
-import com.wordnik.swagger.annotations.ApiModelProperty
+import io.swagger.annotations.ApiModelProperty
 
 class ScriptConfig {
 
