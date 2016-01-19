@@ -48,7 +48,7 @@ class ScriptExecutionRepo implements ApplicationListener<ContextRefreshedEvent> 
     CF_EXECUTIONS = ColumnFamily.newColumnFamily(CF_NAME, IntegerSerializer.get(), StringSerializer.get())
 
     try {
-      runQuery '''select * from execution;'''
+      runQuery '''SELECT * FROM execution LIMIT 1;'''
     } catch (BadRequestException ignored) {
       runQuery '''\
                 CREATE TABLE execution(
