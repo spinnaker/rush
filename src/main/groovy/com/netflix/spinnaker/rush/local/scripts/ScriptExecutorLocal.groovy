@@ -108,15 +108,16 @@ class ScriptExecutorLocal implements ScriptExecutor {
           executor.setWatchdog(watchdog)
           executor.execute(commandLine, resultHandler)
 
+          // Give the execution some time to spin up.
+          sleep(500)
+
+          executionRepo.updateStatus(executionId, ScriptExecutionStatus.RUNNING)
+
           executionIdToHandlerMap.put(executionId, [
             handler: resultHandler,
             watchdog: watchdog,
             stdOutAndErr: stdOutAndErr
           ])
-          executionRepo.updateStatus(executionId, ScriptExecutionStatus.RUNNING)
-
-          // Give the execution some time to spin up.
-          sleep(500)
 
           // Update the status right away so we can fail fast if necessary.
           updateExecution(executionId)
