@@ -176,8 +176,8 @@ class ScriptExecutorLocal implements ScriptExecutor {
 
         executionStatus = resultHandler.exitValue == 0 ? ScriptExecutionStatus.SUCCESSFUL : ScriptExecutionStatus.FAILED
 
-        executionRepo.updateStatus(executionId, executionStatus)
         executionIdToHandlerMap.remove(executionId)
+        executionRepo.updateStatus(executionId, executionStatus)
       } else {
         executionStatus = ScriptExecutionStatus.RUNNING
       }
