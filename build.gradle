@@ -131,6 +131,13 @@ ospackage {
     fileType = CONFIG | NOREPLACE
   }
 
+  from(file('etc/init/rush-trigger.conf')) {
+    into('/etc/init')
+    user = 'root'
+    permissionGroup = 'root'
+    fileType = CONFIG | NOREPLACE
+  }
+
   from(file('etc/logrotate.d/rush')) {
     into('/etc/logrotate.d')
     user = 'root'
