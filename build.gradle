@@ -138,6 +138,7 @@ ospackage {
     fileType = CONFIG | NOREPLACE
   }
 
+  os = LINUX
 }
 
 buildDeb {
