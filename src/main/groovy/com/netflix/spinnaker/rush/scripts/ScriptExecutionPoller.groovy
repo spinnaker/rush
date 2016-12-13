@@ -72,7 +72,7 @@ class ScriptExecutionPoller implements ApplicationListener<ContextRefreshedEvent
       } as Action0, 0, runningExecutionUpdateIntervalSeconds, TimeUnit.SECONDS
     )
 
-    // Check for executions managed by this rush instance that are listed in cassandra as canceled.
+    // Check for executions managed by this rush instance that are listed in cassandra as cancelled.
     Schedulers.io().createWorker().schedulePeriodically(
       {
         try {

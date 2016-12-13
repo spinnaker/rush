@@ -210,7 +210,7 @@ class ScriptExecutorLocal implements ScriptExecutor {
     executionIdToHandlerMap.remove(executionId)
 
     // Update the status in cassandra.
-    executionRepo.updateStatus(executionId, ScriptExecutionStatus.CANCELED)
+    executionRepo.updateStatus(executionId, ScriptExecutionStatus.CANCELLED)
   }
 
   @Override
